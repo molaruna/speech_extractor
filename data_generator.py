@@ -1,5 +1,6 @@
 # data_generator.py
-# Creating datset of vector inputs for NN
+# Generate two synthetic signal timeseries and mix the signals
+# using a 2 x 2 weight matrix
 # Author: maria.olaru@
 
 import random
@@ -7,69 +8,62 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+from scipy import signal
 
 
 # Input preferences
-N = 2   # number of vectors
-L = 100  # length of datapoints 
+T = np.linspace(0, 1, 800, endpoint = False) #Sampling at 800Hz for 1s
+W = np.matrix('4 2; 2 4') # Weights
 
-def generate_vectors():
-    """ Create speech vectors. """
-    np.random.seed(20)
-    v = np.random.uniform(0, 1, N*2)
-    v = v.reshape(N, 2)
-    return v
+def generate_signals():
+    """ Create a sine and square signal """    
+    sig1 = np.sin(2 * np.pi * 10 * T)
+    sig2 = signal.square(2 * np.pi * 10 * T)
+    
+    sig_vec = np.column_stack((sig1, sig2))
+    
+    return sig_vec
         
-def plot_vectors():
-    """ Plots speech vectors. """
-    sns.set(style="white", palette="muted", color_codes=True)
-    color_array = sns.color_palette("hls", N)
+def plot_signals():
+    """ Plots speech signals. """
+    sig_vec = generate_signals()
+    plt.plot(T, sig_vec[:,0], label = "sine wave")
+    plt.plot(T, sig_vec[:,1], label = "square wave")
     
-    fig, ax = plt.subplots()
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.title('Synthetic Sound Signal')
     
-    origin = np.zeros(N)
-    v = generate_vectors()
-    print("vector: \n", v)
-    
-    ax.quiver(origin, 
-              origin, 
-              v[:,0], 
-              v[:,1], 
-              color = color_array, 
-              scale = 2)
-    ax.axis([0, 1, 0, 1])
-    
-    plt.title("Speech Vectors")
-    plt.xlabel("dim 1")
-    plt.ylabel("dim 2")
-    
+    plt.legend()
     plt.show()
 
-def generate_data():
-    """ Create datset. """
-    d = np.zeros((N, L, 2)) 
-    v = generate_vectors()   
-    for i in range(N):
-        d[i, 0:L, 0] = np.linspace(0, v[i, 0], L)
-        d[i, 0:L, 1] = np.linspace(0, v[i, 1], L)
-    return d
+def mix_signals():
+    """ Multiply incoming signal (Nx2) by weighting matrix (2x2) 
+          and output a Nx2 mixed signal """
 
-def process_data():
-    """ Converge & transform to 1D vector. """
-    d = generate_data()
+    sig_vec = generate_signals()      
+    M = sig_vec * W
+
+    print(M)
     
-    
-    indx_s = np.random.permutation(d.shape[0]) #shuffle vector type
-    ds = d[indx_s, :, :]
-    dsv = ds.reshape(-1, order = 'F') #output col1 (dim1) then col2 (dim2)
-    
-    return dsv
+    return M
 
 def main():
-    plot_vectors()
- 
-    fn_begin = 'lang_data_v1.0_' + str(N) + '_' + str(L) + '_'
-    np.savetxt(fn_begin + 'input.csv', process_data(), 
+    plot_signals()
+    
+    #Save original signal
+    fn_begin = 'data/lang_input_unmixed'
+    np.savetxt(fn_begin + '.csv', generate_signals(), 
+               delimiter = ',')
+    
+    #Save weights
+    fn_begin = 'data/lang_input_weights'
+    np.savetxt(fn_begin + '.csv', generate_signals(), 
+               delimiter = ',')
+    
+    #Save mixed signal
+    fn_begin = 'data/lang_input_mixed'
+    np.savetxt(fn_begin + '.csv', W, 
                delimiter = ',')
 
 if __name__ == '__main__': 
