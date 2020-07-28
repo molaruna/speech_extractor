@@ -18,7 +18,8 @@ W = np.matrix('4 2; 2 4') # Weights
 def generate_signals():
     """ Create a sine and square signal """    
     sig1 = np.sin(2 * np.pi * 10 * T)
-    sig2 = signal.square(2 * np.pi * 10 * T)
+    sig2 = np.sin(2 * np.pi * 5 * T)
+    #sig2 = signal.square(2 * np.pi * 10 * T) Square wave
     
     sig_vec = np.column_stack((sig1, sig2))
     
@@ -27,8 +28,8 @@ def generate_signals():
 def plot_signals():
     """ Plots speech signals. """
     sig_vec = generate_signals()
-    plt.plot(T, sig_vec[:,0], label = "sine wave")
-    plt.plot(T, sig_vec[:,1], label = "square wave")
+    plt.plot(T, sig_vec[:,0], label = "sine wave 1")
+    plt.plot(T, sig_vec[:,1], label = "sine wave 2")
     
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
