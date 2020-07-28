@@ -18,7 +18,7 @@ W = np.matrix('4 2; 2 4') # Weights
 def generate_signals():
     """ Create a sine and square signal """    
     sig1 = np.sin(2 * np.pi * 10 * T)
-    sig2 = np.sin(2 * np.pi * 5 * T)
+    sig2 = np.sin(2 * np.pi * 6 * T)
     #sig2 = signal.square(2 * np.pi * 10 * T) Square wave
     
     sig_vec = np.column_stack((sig1, sig2))
